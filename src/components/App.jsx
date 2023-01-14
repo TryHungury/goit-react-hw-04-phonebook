@@ -77,8 +77,9 @@ export const App = () => {
     setFilter(filterValue)
   }
 
-    const filterNormalize = filter.toLowerCase();
-    const visibleContacts = useMemo(()=>{ return contacts.filter((contact) => contact.name.toLowerCase().includes(filterNormalize))
+  const visibleContacts = useMemo(()=>{ 
+      const filterNormalize = filter.toLowerCase();
+      return contacts.filter((contact) => contact.name.toLowerCase().includes(filterNormalize))
     }, [contacts, filter]) 
 
     return (
