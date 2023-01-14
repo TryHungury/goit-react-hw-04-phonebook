@@ -1,9 +1,10 @@
 import styled from "styled-components";
-import { Component } from "react";
+// import { Component } from "react";
 import { Box } from "./box/Box";
 import { PhoneBook } from "./phonebook/PhoneBook";
 import { Contacts } from "./contacts/Contacts";
 import { nanoid } from "nanoid";
+import { useState, useEffect, useMemo } from "react";
 
 const Title = styled.h1`
   border-radius: ${p=>p.theme.radii.normal};
@@ -29,34 +30,20 @@ const TitleH2 = styled.h2`
 
 const LS_PHONE_BOOK = 'phone_book';
 
-export class App extends Component {
-  state = {
-    contacts: [],
-    filter: '',
-  }
+export const App = () => {
+  const [contacts, setContacts] = useState(()=>{
+    return JSON.parse(localStorage.getItem(LS_PHONE_BOOK)) ?? []
+  })
+  const [filter, setFilter] = useState("")
 
-  componentDidMount() {
-    const saveContacts = JSON.parse(localStorage.getItem(LS_PHONE_BOOK));
+  useEffect(()=>{
+    localStorage.setItem(LS_PHONE_BOOK, JSON.stringify(contacts))
+  }, [contacts])
 
-    if (saveContacts) {
-      this.setState({contacts: saveContacts})
-    }
-
-    return
-  }
-
-  componentDidUpdate(_, prevState) {
-    if (prevState.contacts.length !== this.state.contacts.length) {
-      localStorage.setItem(LS_PHONE_BOOK, JSON.stringify(this.state.contacts))
-    }
-
-    return
-  }
-
-  addNewContact = ({name, number}) => {
+  const addNewContact = ({name, number}) => {
     let count = 0;
 
-    this.state.contacts.map((contact)=>{
+    contacts.map((contact)=>{
      if (contact.name === name) {
       return count += 1;
     }
@@ -71,50 +58,40 @@ export class App extends Component {
         number,
       }
   
-      this.setState((prevState)=>{
-        return {
-          contacts: [ contact, ...prevState.contacts ],
-        }
-      })
+      setContacts([contact, ...contacts])
 
     } else {
       return alert('This contact is already in your phone book...')
     }
   }
 
-  handleDeleteContact = (id) => {
-    this.setState(prevState=>{
-      return {
-        contacts: prevState.contacts.filter((contact)=>contact.id !== id)
-      }
+  const handleDeleteContact = (id) => {
+    setContacts(prev=>{
+      return prev.filter((contact)=>contact.id !== id)
     })
   }
 
-  handleFilterContacts = (e) => {
+  const handleFilterContacts = (e) => {
     const filterValue = e.target.value;
-    const filterName = e.target.name;
 
-    this.setState({[filterName]: filterValue})
+    setFilter(filterValue)
   }
 
-  render() {
-    const {contacts, filter} = this.state;
-
     const filterNormalize = filter.toLowerCase();
-    const visibleContacts = contacts.filter((contact) => contact.name.toLowerCase().includes(filterNormalize))
+    const visibleContacts = useMemo(()=>{ return contacts.filter((contact) => contact.name.toLowerCase().includes(filterNormalize))
+    }, [contacts, filter]) 
 
     return (
       <Box height= "100%"  display= "flex" flexDirection="column" justifyContent= "space-evenly" alignItems= "center" fontSize= "40px" backgroundColor="backgroundSecondary">
         <Title>Ukraine Win❤️</Title>
         <Box display="flex" flexDirection="column" justifyContent= "space-evenly" alignItems= "center" as={"section"}>
           <TitleH2>Phonebook</TitleH2>
-          <PhoneBook onSubmit={this.addNewContact}></PhoneBook>
+          <PhoneBook onSubmit={addNewContact}></PhoneBook>
         </Box>
         <Box display="flex" flexDirection="column" justifyContent= "space-evenly" alignItems= "center" as={"section"}>
           <TitleH2>Contacts</TitleH2>
-          <Contacts contacts={visibleContacts} filter={filter} onChange={this.handleFilterContacts} onClick={this.handleDeleteContact}></Contacts>
+          <Contacts contacts={visibleContacts} filter={filter} onChange={handleFilterContacts} onClick={handleDeleteContact}></Contacts>
         </Box>
       </Box>
     );
   }
-};

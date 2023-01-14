@@ -1,5 +1,4 @@
 import { Box } from "components/box/Box"
-import { Component } from "react"
 import styled from "styled-components"
 
 const Label = styled.label`
@@ -63,9 +62,7 @@ const DeleteContactBtn = styled.button`
   }
 `
 
-export class Contacts extends Component {
-  render(){
-    const {contacts, filter, onClick, onChange} = this.props;
+export const Contacts = ({contacts, filter, onClick, onChange}) => {
     return <Box  display= "flex" flexDirection="column" justifyContent= "space-evenly" alignItems= "center" p="0" as={"ul"}>
         <Box style={{listStyle: "none"}} display="flex" justifyContent= "center" alignItems= "center" as={"li"}>
             <Label>Find contacts by name<FilterInput placeholder="pls input name, which you want search..." name="filter" value={filter} onChange={onChange}></FilterInput></Label>
@@ -74,6 +71,5 @@ export class Contacts extends Component {
             return <ContactsItem key={id}>{name}: {number}<DeleteContactBtn type="button" onClick={()=>onClick(id)}>Delete</DeleteContactBtn></ContactsItem>
         })}
     </Box>
-  }
 } 
 

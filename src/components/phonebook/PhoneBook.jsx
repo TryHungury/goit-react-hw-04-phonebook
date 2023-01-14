@@ -1,6 +1,6 @@
 import { Box } from "components/box/Box"
-import { Component } from "react"
 import styled from "styled-components"
+import { useState } from "react";
 
 const Label = styled.label`
   display: flex;
@@ -58,61 +58,58 @@ const AddContactBtn = styled.button`
     background-color: ${p=>p.theme.colors.accent};
     color: ${p=>p.theme.colors.text};
   }
-`
-export class PhoneBook extends Component {
+  `
+export const PhoneBook = ({onSubmit}) => {
+  const [state, setState] = useState({
+    name: "",
+    number: ""
+  })
 
-  state = {
-    name: '',
-    number: ''
+  const reset = () => {
+    setState({name: "", number: ""})
   }
 
-  reset = () => {
-    this.setState({name: "", number: ""})
-  }
-
-  handleChange = (e) => {
+  const handleChange = (e) => {
       const inputName = e.target.name;
       const inputValue = e.target.value;
     
-      return this.setState({[inputName] : inputValue})
+      return setState((prev)=>({...prev, [inputName]: inputValue}))
     }
 
-  handleSubmit = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
-    this.props.onSubmit(this.state);
+    onSubmit(state);
 
-    this.reset()
+    reset()
   }
 
-    render() {
-      const {name, number} = this.state;
-    return <Box onSubmit={this.handleSubmit} display="flex" flexWrap="wrap" width="650px" justifyContent="space-evenly" alignItems="start" mt="3" as={"form"}>
-        <Label>Name
-        <NameInput
-            placeholder="pls input your name..."
-            type="text"
-            name="name"
-            pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
-            title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
-            required
-            value={name}
-            onChange={this.handleChange}>
-        </NameInput>
-        </Label>
-        <Label>Number
-        <TelInput
-            placeholder="pls input your number..."
-            type="tel"
-            name="number"
-            pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
-            title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
-            required
-            value={number}
-            onChange={this.handleChange}>
-        </TelInput>
-        </Label>
-        <AddContactBtn type="submit">Add contact</AddContactBtn>
-    </Box>
-      }
+  const {name, number} = state;
+  return <Box onSubmit={handleSubmit} display="flex" flexWrap="wrap" width="650px" justifyContent="space-evenly" alignItems="start" mt="3" as={"form"}>
+      <Label>Name
+      <NameInput
+          placeholder="pls input your name..."
+          type="text"
+          name="name"
+          pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
+          title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
+          required
+          value={name}
+          onChange={handleChange}>
+      </NameInput>
+      </Label>
+      <Label>Number
+      <TelInput
+          placeholder="pls input your number..."
+          type="tel"
+          name="number"
+          pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
+          title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
+          required
+          value={number}
+          onChange={handleChange}>
+      </TelInput>
+      </Label>
+      <AddContactBtn type="submit">Add contact</AddContactBtn>
+  </Box>
 }
